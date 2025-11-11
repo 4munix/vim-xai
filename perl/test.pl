@@ -1,8 +1,7 @@
 use LWP::UserAgent;
 use HTTP::Request;
 use JSON;
-use utf8;
-use open ':std', ':encoding(UTF-8)';
+use Encode qw(encode);
 
 $chunk_buffer = '';
 $collect_messages = '';
@@ -28,7 +27,7 @@ sub main {
 
     $lines = $curbuf->Count();
     # Append newlines.
-    $curbuf->Append($lines, ("", "", ""));
+	# $curbuf->Append($lines, ("", "", ""));
 
     $xai_xd_obj = decode_json "$vim_xai_complete_default";
     $xai_xd_obj->{stream} = ($xai_xd_obj->{stream} == 1) ? \1 : \0;
@@ -91,19 +90,20 @@ sub do_msg {
         next unless defined $json_decoded->{choices}[0]{delta}{content};
         return if $json_decoded->{choices}[0]->{finish_reason};
 
-        $collect_messages .= $json_decoded->{choices}[0]->{delta}->{content};
+        $collect_messages = $json_decoded->{choices}[0]->{delta}->{content};
+		$collect_messages = encode('UTF-8', $collect_messages);
 
         # Update Vim buffer
         VIM::DoCommand("normal! G");
         VIM::DoCommand("redraw");
 
         $lines = $curbuf->Count();
+		$last_line = VIM::Eval("getline($lines)");
+		$updated = $last_line . $collect_messages;
 
-        $curbuf->Set($lines, $collect_messages);
-
-        VIM::DoCommand('silent! %s/\%x00/\r/g');
-        $lines = $curbuf->Count();
-        $collect_messages = $curbuf->Get($lines);
+		VIM::DoCommand("call setline($lines, '$updated')");
+		# Set newlines.
+		VIM::DoCommand('silent! %s/\%x00/\r/g');
     }
 }
 
