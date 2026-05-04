@@ -1,0 +1,128 @@
+=pod
+
+=head1 NAME
+
+vim-xai.pl - A Perl script for interacting with Grok AI completion service
+
+=head1 SYNOPSIS
+
+    use LWP::UserAgent;
+    use HTTP::Request;
+    use JSON;
+    use utf8;
+    use open ':std', ':encoding(UTF-8)';
+
+    main();
+
+=head1 DESCRIPTION
+
+This script is designed to interact with an AI completion service, for use
+within a Vim plugin. It sends a request to an AI service with user-defined
+parameters and processes the streaming response to update the Vim buffer in
+real-time.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<main()>
+
+The main function orchestrates the script's operation:
+
+=over 4
+
+=item * Evaluates Vim variables for configuration.
+
+=item * Prepares and sends an HTTP POST request to the AI service.
+
+=item * Handles the response, either streaming or non-streaming, and updates the Vim buffer accordingly.
+
+=back
+
+=item B<do_msg($chunk)>
+
+Processes chunks of the streaming response:
+
+=over 4
+
+=item * Accumulates chunks until a complete message is received.
+
+=item * Decodes JSON from the message chunks.
+
+=item * Updates the Vim buffer with the AI's response content.
+
+=item * Ensures immediate output by setting autoflush.
+
+=back
+
+=back
+
+=head1 VARIABLES
+
+=over 4
+
+=item C<$chunk_buffer>
+
+Stores incomplete chunks of the streaming response.
+
+=item C<$collect_messages>
+
+Accumulates the content of the AI's response for display.
+
+=item C<@evals>
+
+An array of Vim variables to evaluate for configuration.
+
+=item C<$xai_xd_obj>
+
+A JSON object representing the request to the AI service.
+
+=item C<$json_string>
+
+The JSON encoded string of the request object.
+
+=item C<$headers>
+
+HTTP headers for the request, including authentication.
+
+=item C<$ua>
+
+An instance of LWP::UserAgent for making HTTP requests.
+
+=item C<$req>
+
+The HTTP request object.
+
+=item C<$response>
+
+The HTTP response object from the AI service.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item * LWP::UserAgent
+
+=item * HTTP::Request
+
+=item * JSON
+
+=item * utf8
+
+=item * open
+
+=back
+
+=head1 AUTHOR
+
+Albert Mendes <tray.mendes@gmail.com>
+
+=head1 SEE ALSO
+
+L<Vim>, L<Perl>, L<JSON>, L<LWP::UserAgent>
+
+
+=cut
+
