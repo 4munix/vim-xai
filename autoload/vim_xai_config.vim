@@ -8,7 +8,7 @@ let g:vim_xai_complete_default = '{
 \  "messages": [
 \     {
 \       "role": "system",
-\       "content": "You are Grok, a chatbot inspired by the Hitchhikers Guide to the Galaxy."
+\       "content": ""
 \     }
 \  ],
 \  "model": "grok-4-0709",
