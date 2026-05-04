@@ -2,7 +2,7 @@ call vim_xai_config#load()
 
 let s:plugin_root = expand('<sfile>:p:h:h')
 let s:vim_xai_maxlines = 10000
-let s:vim_xai_test = s:plugin_root . "/perl/test.pl"
+let s:vim_xai_test = s:plugin_root . "/perl/vim-xai.pl"
 let s:vim_xai_args = ""
 
 function! vim_xai#Testi(...)
