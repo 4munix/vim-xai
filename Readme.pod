@@ -21,6 +21,17 @@ within a Vim plugin. It sends a request to an AI service with user-defined
 parameters and processes the streaming response to update the Vim buffer in
 real-time.
 
+=head1 TEASER
+
+=begin html
+
+<video controls width="640" height="360">
+  <source src="https://github.com/4munix/ghcdn/raw/refs/heads/main/vim-xai/vim-xai.mkv" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+=end html
+
 =head1 FUNCTIONS
 
 =over 4
