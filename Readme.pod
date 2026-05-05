@@ -26,6 +26,9 @@ real-time.
 =begin html
 
 <img src="https://github.com/4munix/ghcdn/blob/main/vim-xai/vim-xai.gif?raw=true" width="640" height="360">
+<br>
+<br>
+<a href="https://github.com/4munix/ghcdn/raw/refs/heads/main/vim-xai/vim-xai.mkv">Higher res video</a>
 
 =end html
 
