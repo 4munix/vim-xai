@@ -11,7 +11,7 @@ let g:vim_xai_complete_default = '{
 \       "content": ""
 \     }
 \  ],
-\  "model": "grok-4-0709",
+\  "model": "grok-latest",
 \  "stream": 1,
 \  "temperature": 0
 \}'
