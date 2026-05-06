@@ -25,18 +25,10 @@ real-time.
 
 =begin html
 
-<!--
 <img src="https://github.com/4munix/ghcdn/blob/main/vim-xai/vim-xai.gif?raw=true" width="640" height="360">
 <br>
 <br>
 <a href="https://github.com/4munix/ghcdn/raw/refs/heads/main/vim-xai/vim-xai.mkv">Higher res video</a>
--->
-
-<video style="margin-left: 70px" controls width="800" poster="poster.jpg" muted autoplay loop>
-  <source src="https://github.com/4munix/ghcdn/raw/refs/heads/main/vim-xai/vim-xai.mp4" type="video/mp4">
-  <!-- Fallback: link to file -->
-  <a href="path/to/video.mp4">Download the video</a>
-</video>
 
 =end html
 

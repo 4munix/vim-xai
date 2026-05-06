@@ -1,0 +1,814 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>vim-xai.pl - A Perl script for interacting with Grok AI completion service</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@tahoe-arm64.local" />
+<style>
+* {
+  color: initial;
+}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  /* max-width: 91ch; */
+  width: 100%;
+  font-family: monospace;
+  background: black;
+  color: #ccc;
+  font-size: 16px;
+  padding-bottom: 100vh;
+  overflow-x: hidden;
+}
+
+p,i,pre,code,font {
+  color: #ccc;
+}
+
+h1,h2 {
+  color: white;
+  font-size: 1rem;
+  margin-bottom: -1rem;
+  padding-top: 1rem;
+}
+h2 {
+  margin-left: 3ch;
+}
+h3,h4 {
+  font-size: 1rem;
+  font-weight: normal;
+  margin-left: 7ch;
+  text-decoration: underline;
+  color: #ccc;
+}
+
+dt {
+  margin-left: 7ch;
+  color: #ccc;
+}
+
+b {
+  color: white;
+}
+
+p {
+  margin-left: 7ch;
+  line-height: 1.2rem;
+}
+
+ul {
+  margin-left: 7ch;
+}
+
+pre {
+  margin-left: 11ch;
+}
+
+a {
+  color: #fff;
+}
+a:visited {
+  color: #a5a5a5;
+}
+
+
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  padding-right: 4rem;
+}
+
+.navigation {
+  position: fixed;
+  width: 377px;
+  height: 100vh;
+  background: #0a0a0a;
+  overflow: auto;
+  left: 0;
+  transition: left .3s;
+}
+.navi-hide {
+  left: -319px !important;
+}
+.navigation a {
+  font-size: .9em;
+}
+.navigation ul {
+  padding: 0;
+  margin: 0;
+  line-height: 1rem;
+  list-style: none;
+}
+.navigation ul#index {
+  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow: auto;
+  overflow-x: hidden;
+}
+.navigation ul li {
+  margin: 0;
+  background: #1e1e1e;
+}
+.navigation ul li ul li {
+  background: #131313;
+}
+.navigation ul li a {
+  display: block;
+  text-decoration: none;
+  padding: .3rem 1rem;
+  border-bottom: 1px solid #000;
+  color: #fff;
+}
+.navigation ul li ul li a {
+  padding: .3rem 3rem;
+  border-bottom: 1px solid #000;
+}
+.navigation ul li ul li ul li a {
+  padding: .3rem 5rem;
+}
+ul li a:hover, ul li a:active, u li a:focus {
+  background: #000;
+}
+.nav-link-active {
+  background: #000;
+}
+
+/*** #links-wrapper ***********************************************************/
+
+#links-wrapper {
+  padding-bottom: 34px;
+}
+
+#links-wrapper h2 {
+  font-size: initial;
+  margin: 0 0 0 1rem;;
+  padding: 1rem 0;
+  background: transparent;
+}
+
+#links-wrapper a:hover {
+  background: initial;
+}
+
+/*** #links-wrapper END *******************************************************/
+
+.navigation .open-close-wrapper {
+  text-align: right;
+  padding: 1rem;
+}
+
+.open-close-wrapper a#open-close-link {
+  all: initial;
+  font-size: .8rem;
+  width: 21px;
+  height: 21px;
+  cursor: pointer;
+  color: #fff;
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-flex;
+  border: 1px solid #fff;
+  padding: 0.1rem;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  transition: all .3s;
+}
+
+a#open-close-link::before {
+  content: '《';
+  position: relative;
+  left: -.2rem;
+}
+a#open-close-link:hover {
+  background: #fff;
+  color: #111;
+}
+
+.navi-closed-link {
+}
+.navi-closed-link::before {
+  content: '》' !important;
+  left: .2rem !important;
+}
+
+.content {
+  position: relative;
+  max-width: 1440px;
+  margin-left: calc(377px + 2rem);
+  padding-left: 2rem;
+  transition: margin-left .3s;
+}
+.c-move-left {
+  margin-left: 72px !important;
+}
+
+
+
+
+pre {
+  background: #0f0f0f;
+  padding: 1.2rem;
+  border-radius: .1rem;
+  max-width: 80ch;
+}
+
+@media (max-width: 430px) {
+  .navigation {
+    z-index: 9;
+  }
+  .content {
+    margin-left: 0;
+    padding: 0 .5rem;
+  }
+  .wrapper {
+    padding-right: .5rem;
+  }
+  h1,h2,h3,h4,dt,p,ul,pre {
+    margin-left: 0;
+  }
+  * {
+    overflow: overlay;
+  }
+  
+}
+</style>
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#TEASER">TEASER</a></li>
+  <li><a href="#FUNCTIONS">FUNCTIONS</a></li>
+  <li><a href="#VARIABLES">VARIABLES</a></li>
+  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>vim-xai.pl - A Perl script for interacting with Grok AI completion service</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>use LWP::UserAgent;
+use HTTP::Request;
+use JSON;
+use utf8;
+use open &#39;:std&#39;, &#39;:encoding(UTF-8)&#39;;
+
+main();</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This script is designed to interact with an AI completion service, for use within a Vim plugin. It sends a request to an AI service with user-defined parameters and processes the streaming response to update the Vim buffer in real-time.</p>
+
+<h1 id="TEASER">TEASER</h1>
+
+<br>
+<br>
+
+<video style="margin-left: 70px" controls width="800" poster="poster.jpg" muted autoplay loop>
+  <source src="https://github.com/4munix/ghcdn/raw/refs/heads/main/vim-xai/vim-xai.mp4" type="video/mp4">
+  <!-- Fallback: link to file -->
+  <a href="path/to/video.mp4">Download the video</a>
+</video>
+
+<h1 id="FUNCTIONS">FUNCTIONS</h1>
+
+<dl>
+
+<dt id="main"><b>main()</b></dt>
+<dd>
+
+<p>The main function orchestrates the script&#39;s operation:</p>
+
+<ul>
+
+<li><p>Evaluates Vim variables for configuration.</p>
+
+</li>
+<li><p>Prepares and sends an HTTP POST request to the AI service.</p>
+
+</li>
+<li><p>Handles the response, either streaming or non-streaming, and updates the Vim buffer accordingly.</p>
+
+</li>
+</ul>
+
+</dd>
+<dt id="do_msg-chunk"><b>do_msg($chunk)</b></dt>
+<dd>
+
+<p>Processes chunks of the streaming response:</p>
+
+<ul>
+
+<li><p>Accumulates chunks until a complete message is received.</p>
+
+</li>
+<li><p>Decodes JSON from the message chunks.</p>
+
+</li>
+<li><p>Updates the Vim buffer with the AI&#39;s response content.</p>
+
+</li>
+<li><p>Ensures immediate output by setting autoflush.</p>
+
+</li>
+</ul>
+
+</dd>
+</dl>
+
+<h1 id="VARIABLES">VARIABLES</h1>
+
+<dl>
+
+<dt id="chunk_buffer"><code>$chunk_buffer</code></dt>
+<dd>
+
+<p>Stores incomplete chunks of the streaming response.</p>
+
+</dd>
+<dt id="collect_messages"><code>$collect_messages</code></dt>
+<dd>
+
+<p>Accumulates the content of the AI&#39;s response for display.</p>
+
+</dd>
+<dt id="evals"><code>@evals</code></dt>
+<dd>
+
+<p>An array of Vim variables to evaluate for configuration.</p>
+
+</dd>
+<dt id="xai_xd_obj"><code>$xai_xd_obj</code></dt>
+<dd>
+
+<p>A JSON object representing the request to the AI service.</p>
+
+</dd>
+<dt id="json_string"><code>$json_string</code></dt>
+<dd>
+
+<p>The JSON encoded string of the request object.</p>
+
+</dd>
+<dt id="headers"><code>$headers</code></dt>
+<dd>
+
+<p>HTTP headers for the request, including authentication.</p>
+
+</dd>
+<dt id="ua"><code>$ua</code></dt>
+<dd>
+
+<p>An instance of LWP::UserAgent for making HTTP requests.</p>
+
+</dd>
+<dt id="req"><code>$req</code></dt>
+<dd>
+
+<p>The HTTP request object.</p>
+
+</dd>
+<dt id="response"><code>$response</code></dt>
+<dd>
+
+<p>The HTTP response object from the AI service.</p>
+
+</dd>
+</dl>
+
+<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+
+<ul>
+
+<li><p>LWP::UserAgent</p>
+
+</li>
+<li><p>HTTP::Request</p>
+
+</li>
+<li><p>JSON</p>
+
+</li>
+<li><p>utf8</p>
+
+</li>
+<li><p>open</p>
+
+</li>
+</ul>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Albert Mendes &lt;tray.mendes@gmail.com&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>Vim</a>, <a>Perl</a>, <a>JSON</a>, <a>LWP::UserAgent</a></p>
+
+
+<script>
+class MANochrome {
+  constructor(options={}) {
+    this.html = document.body;
+    this.generator = (typeof(options.generator) === "string") ? options.generator : "pod2html";
+    this.options = options;
+    this.headers = null;
+    this.index = null;
+    this.index_links = null;
+    this.navigation = null;
+    this.navigation_active_css_class = "nav-link-active";
+    this.navi_open = true;
+    this.windowMaxWidth = 430;
+
+    this.build_index()
+      .then((resp) => this.separate_index_content())
+      .then((resp) => this.prettify_navigation())
+      .then((resp) => { return this.sort_headers(); })
+      .then((resp) => { 
+        this.headers = resp;
+
+        this.insert_open_close()
+          .then(this.insert_links())
+          .then(this.insert_logo())
+          .then(this.set_mobile())
+          .then(this.set_options());
+
+      });
+  }
+
+  set_options() {
+    return new Promise((resolve, reject) => {
+      resolve(true);
+    });
+  }
+
+  set_mobile() {
+    return new Promise((resolve, reject) => {
+      if (window.innerWidth <= this.windowMaxWidth) {
+        document.getElementById("open-close-link").click();
+      }
+      resolve(true);
+    });
+  }
+
+  navi_open_close(link) {
+    let navi = document.getElementById("navigation");
+    let content = document.getElementsByClassName("content")[0];
+    if (this.navi_open) {
+      navi.classList.add("navi-hide");
+      content.classList.add("c-move-left");
+      link.classList.add("navi-closed-link");
+      this.navi_open = !this.navi_open;
+    }
+    else {
+      navi.classList.remove("navi-hide");
+      content.classList.remove("c-move-left");
+      link.classList.remove("navi-closed-link");
+      this.navi_open = !this.navi_open;
+    }
+  }
+
+  insert_open_close() {
+    return new Promise((resolve, reject) => {
+      let ocwrapper = document.createElement("div");
+      ocwrapper.classList.add("open-close-wrapper");
+      ocwrapper.setAttribute("id", "open-close-wrapper");
+
+      let a = document.createElement("a");
+      a.setAttribute("id", "open-close-link");
+      a.setAttribute("href", "#");
+
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.navi_open_close(a);
+      });
+
+      ocwrapper.appendChild(a);
+
+      let navi = document.getElementById("navigation");
+      navi.insertBefore(ocwrapper, navi.firstChild);
+    });
+  }
+
+  insert_links() {
+    return new Promise((resolve, reject) => {
+      if (typeof(this.options.links) !== "object") {
+        resolve(false);
+        return;
+      }
+      let wrapper = document.createElement("div");
+      wrapper.setAttribute("id", "links-wrapper");
+
+      let h2 = document.createElement("h2");
+      h2.textContent = "🔗 LINKS";
+      let ul = document.createElement("ul")
+
+      this.options.links.map((item, i) => {
+        let li = document.createElement("li");
+        let a = document.createElement("a");
+        a.innerHTML = item.html;
+        a.setAttribute("href", item.url);
+        a.setAttribute("target", "_blank");
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+
+      wrapper.appendChild(h2);
+      wrapper.appendChild(ul);
+
+      let navi = document.getElementById("navigation");
+      navi.appendChild(wrapper);
+
+      resolve(true);
+    });
+  }
+
+  insert_logo() {
+    return new Promise((resolve, reject) => {
+      if (typeof(this.options.logo_path) !== "string") {
+        resolve(false);
+        return;
+      }
+
+      let a = document.createElement("a");
+      a.classList.add("manochrome-logo-link");
+      a.setAttribute("href", "#");
+
+      let navigation_node = document.getElementById("navigation");
+      let img = document.createElement("img");
+      img.setAttribute("src", this.options.logo_path);
+      img.setAttribute("id", "manochrome-logo");
+      img.style.width = "100%";
+
+      a.appendChild(img);
+
+      navigation_node.insertBefore(a, navigation_node.firstChild);
+
+      resolve(true);
+    });
+  }
+
+  build_index() {
+    return new Promise((resolve, reject) => {
+      let msg = `method build_index() not implemented in class ${this.constructor.name}`
+      console.warn(msg);
+      resolve(msg);
+    });
+  }
+
+  separate_index_content() {
+    return new Promise((resolve, reject) => {
+
+      this.body = document.body.cloneNode(true);
+      this.wrapper = document.createElement("div");
+      this.wrapper.classList.add("wrapper");
+
+      this.content = document.createElement("div");
+      this.content.classList.add("content");
+      this.content.innerHTML = this.body.innerHTML;
+
+      this.navigation = document.createElement("div");
+      this.navigation.classList.add("navigation");
+      this.navigation.setAttribute("id", "navigation");
+      this.navigation.innerHTML = this.index.outerHTML;
+
+      [
+        this.navigation,
+        this.content
+      ].map((node, index) => {
+        this.wrapper.appendChild(node);
+      });
+
+      document.body.innerHTML = this.wrapper.outerHTML;
+
+      // Get the cloned index.
+      this.index = document.getElementById("index");
+
+      resolve("separate_index_content done");
+    });
+  }
+
+  get_nav_index_by_string(str, get_num=0) {
+    return new Promise((resolve, reject) => {
+      for (let i = 0; i < this.index_links.length; i++) {
+        if (this.index_links[i].innerHTML === str) {
+          if (get_num === 0)
+            resolve(this.index_links[i]);
+          else
+            resolve(i);
+
+          return;
+        }
+      }
+    });
+
+    resolve(false);
+    return;
+  }
+
+  async change_nav_on_scroll() {
+    let offset_y = window.scrollY;
+    let grace = 21;
+
+    for (let i = 0; i < this.headers.length; i++) {
+      let check_node = await this.get_nav_index_by_string(this.headers[i].innerHTML);
+
+      if (offset_y >= (this.headers[i].offsetTop - grace)) {
+        this.set_link_active(check_node);
+      }
+
+    }
+  }
+
+  set_link_active(node) {
+    for (let i = 0; i < this.index_links.length; i++) {
+      this.index_links[i].classList.remove(this.navigation_active_css_class);
+    }
+
+    node.classList.add(this.navigation_active_css_class);
+  }
+
+  async sort_headers() {
+    let new_arr = [];
+    for (let i = 0; i < this.headers.length; i++) {
+      let link_index = await this.get_nav_index_by_string(this.headers[i].innerHTML, 1);
+      new_arr[link_index] = this.headers[i];
+    }
+
+    return new_arr;
+  }
+
+  prettify_navigation() {
+    return new Promise((resolve, reject) => {
+      this.index_links = this.index.getElementsByTagName("a");
+
+      for (let i = 0; i < this.index_links.length; i++) {
+        this.index_links[i].addEventListener("click", (e) => {
+          this.set_link_active(this.index_links[i]);
+        });
+      }
+
+      this.set_link_active(this.index_links[0]);
+
+      this.headers = Array.from(document.getElementsByTagName("h1"))
+      this.headers = this.headers.concat(Array.from(document.getElementsByTagName("h2")));
+      this.headers = this.headers.concat(Array.from(document.getElementsByTagName("h3")));
+      this.headers = this.headers.concat(Array.from(document.getElementsByTagName("h4")));
+
+      window.addEventListener("scroll", (e) => {
+        this.change_nav_on_scroll();
+      });
+
+      resolve("prettify_navigation done");
+    });
+  }
+
+  /*
+   * HTML generated by pod2html has an UL with id "index".
+   */
+  static has_index_id() {
+    return (document.getElementById("index") !== null) ? (
+      (document.getElementById("index").tagName === "UL") ? true : false
+    ) : false;
+  }
+  /*
+   * So far in development, we only have pod2html.
+   */
+  static determine_generator() {
+    const gen_try = document.head.querySelector(
+      'meta[name="generator"]'
+    );
+
+    return (gen_try === null) ? "pod2html" :
+      (
+        (gen_try.content.includes("groff")) ? "groff" : gen_try.content
+      )
+  }
+}
+
+class MANochrome_pod extends MANochrome {
+  constructor(options={}) {
+    super(options);
+  }
+
+  /*
+   * Index is already there.
+   * Clone Node (<UL>) and remove original.
+   */
+  build_index() {
+    return new Promise((resolve, reject) => {
+      const index = document.getElementById("index");
+      this.index = index.cloneNode(true);
+      index.remove();
+      resolve("build_index done");
+    });
+  }
+}
+
+/*
+ * TODO
+ * This is experimental.
+ */
+class MANochrome_groff extends MANochrome {
+  constructor(generator) {
+    super(generator);
+  }
+
+  build_index() {
+    let ul = document.createElement("ul");
+    ul.setAttribute("id", "index");
+    let delete_arr = [];
+
+    return new Promise((resolve, reject) => {
+      let next_link = document.getElementsByTagName("h1")[0];
+      let i = 0;
+      while (next_link.nextElementSibling.tagName !== "HR") {
+        if (next_link.nextElementSibling.tagName !== "A") {
+          next_link = next_link.nextElementSibling;
+          delete_arr.push(next_link);
+          continue;
+        }
+
+        let li = document.createElement("li");
+        let a = next_link.nextElementSibling.cloneNode(true);
+        li.appendChild(a);
+        ul.appendChild(li);
+
+        next_link = next_link.nextElementSibling;
+        delete_arr.push(next_link);
+        i++;
+      }
+
+      /*
+       * Set this.index.
+       */
+      this.index = ul;
+
+      delete_arr.map((node, i) => {
+        node.remove();
+      });
+
+      /* 
+       * Remove HR.
+       */
+      const hr = document.getElementsByTagName("h1")[0].nextElementSibling;
+
+      if (hr.tagName === "HR")
+        hr.remove();
+
+      resolve("build_index done");
+    });
+  }
+}
+</script>
+<script>
+(() => {
+  'use strict';
+
+  const options = {};
+  /*
+   * Add a logo to top of the sidebar.
+   */
+  options.logo_path = "img/logo.png",
+  /*
+   * Add links to the "LINKS" section at the bottom of the sidebar.
+   * The "LINKS" section will only be created if this option is passed.
+   */
+  options.links = [
+    {
+      "url": "https://github.com/4munix/manochrome.git",
+      "html": "<img src=\"img/github-mark-white.svg\" style=\"height:1rem;vertical-align:middle\"> MANochrome repository"
+    }
+  ];
+
+  /*
+   * Initialize manochrome
+   */
+  const manochrome = (MANochrome.has_index_id()) ? 
+    new MANochrome_pod(options) : false;
+
+})();
+</script>
+</body>
+
+</html>
+
+
