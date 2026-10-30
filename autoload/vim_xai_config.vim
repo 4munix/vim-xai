@@ -1,7 +1,6 @@
 let s:plugin_root = expand('<sfile>:p:h:h')
 let s:vim_xai_maxlines = 10000
-"let g:vim_xai_complete_default_url = "https://api.x.ai/v1/chat/completions"
-let g:vim_xai_complete_default_url = "https://api.x.ai/v1"
+let g:vim_xai_complete_default_url = "https://api.x.ai/v1/chat/completions"
 " let g:vim_xai_token = "put this line in your ~/.vimrc and set your token here"
 let g:vim_xai_user_agent = "vim-xai/0.1"
 
